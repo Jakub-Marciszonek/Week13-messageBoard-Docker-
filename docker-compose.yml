@@ -1,0 +1,72 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: messages_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks: 
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  backend:
+    image: jakubm1232/backend:latest # my docker image
+    container_name: backend
+    ports:
+      - "3001:3001" # Backend API
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: messages_db
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    networks:
+      - app-network
+
+  frontend:
+    image: jakubm1232/frontend:latest # my docker image
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    container_name: frontend
+    depends_on:
+      - backend
+    environment:
+      RABBITMQ_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+
+networks:
+  app-network:
+    driver: bridge

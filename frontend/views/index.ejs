@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Message Board</title>
+        <style>
+            body { max-width: 600px; margin: 50px auto; }
+            form { margin-bottom: 20px; }
+            input, textarea { width: 100%; padding: 8px; margin: 5px 0; }
+            button { padding: 10px 20px; color: white; border: none; }
+            .message { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        </style>
+    </head>
+    <body>
+        <h1>Submit Message</h1>
+        <form action="/submit" method="POST">
+            <input type="text" name="author" placeholder="Your name" required>
+            <textarea name="text" rows="3" placeholder="Your message" required></textarea>
+            <button type="submit">Send</button>
+        </form>
+
+        <h2>Messages (<%= messages.length %>)</h2>
+        <% messages.forEach(msg => { %>
+        <div class="message">
+            <strong><%= msg.author %></strong> (<%= new Date(msg.timestamp).toLocaleString() %>)<br>
+            <%= msg.text %>
+        </div>
+        <% }); %>
+    </body>
+</html>
