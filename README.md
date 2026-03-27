@@ -46,13 +46,6 @@ docker compose logs -f frontend # frontend only
 Message Frontend Service
 This is a Node.js frontend service built with Express and EJS. It provides a web UI for submitting messages and displays them by polling the backend API every 5 seconds.
 
-Architecture
-Browser (User)        This Service (:3000)        RabbitMQ
-   Submit form   →    POST /submit   →→→→→→→→→   "messages" queue
-   View page     ←    GET /          ←←←←←←←←←   (in-memory cache)
-                           ↕  polls every 5s
-                      Backend API (:3001)
-
 Components
 Express + EJS (web server)
 Serves an EJS-rendered homepage that displays the current message list. Static assets are served from the public/ directory.
@@ -99,13 +92,6 @@ json{
 # Backend:
 Message Consumer Service
 This is a Node.js backend service that bridges RabbitMQ and MySQL — it listens for incoming messages from a queue and persists them to a database, while also exposing a REST API to read them back.
-
-Architecture
-RabbitMQ Queue          This Service          MySQL DB
-  "messages"    →    consume & save    →    messages table
-                           ↕
-                      REST API (:3001)
-                      GET /messages
 
 Components
 MySQL (dbConnect)
