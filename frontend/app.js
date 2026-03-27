@@ -10,6 +10,7 @@ app.use(express.static('public'));
 let messages = []; //temp replace with rabbitmq
 let channel = null;
 const rabbit = 'amqp://rabbitmq:5672'
+const backendURL = 'http://backend:3001'
 
 async function connectRabbitMQ() {
     try {
@@ -42,7 +43,7 @@ app.post('/submit', async (req, res) => {
 
 setInterval(async () => {
     try {
-        const response = await fetch('http://host.docker.internal:3001/messages');
+        const response = await fetch(`${backendURL}/messages`);
         messages = await response.json();
     } catch (err) {
         console.log('API fetch failed', err.message, err);

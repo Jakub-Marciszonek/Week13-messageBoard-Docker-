@@ -18,8 +18,7 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -52,13 +51,11 @@ services:
 
   frontend:
     image: jakubm1232/frontend:latest # my docker image
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     container_name: frontend
     depends_on:
       - backend
     environment:
-      RABBITMQ_URL: http://localhost:3001
+      BACKEND_API_URL: http://backend:3001
     ports:
       - "3000:3000"
     networks:
